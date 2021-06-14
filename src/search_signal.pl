@@ -1,32 +1,17 @@
 #!/usr/bin/perl
 use strict;
 
-($#ARGV==4) or die "Usage: $0 prefix groupfile matesfastafile annotfile genomefile\n";
-my $SET     = shift; # ./chr17.test
-my $GROUPS  = shift; # "/scratch0/igm3/florea/repeat/Spliced/NA12814.nonconcordant.R.genes.last-exon.nr.sorted.groups";
-my $MATES   = shift; # "/scratch0/igm3/florea/repeat/Spliced/NA12814.nonconcordant.R.mates.fa";
-my $ANNOT   = shift; # "/home/florea/gencode.v22.annotation.gtf";
-my $GENOME  = shift; # "/scratch0/igm3/florea/repeat/hg38c.fa";
-my $HDRS    = $GENOME . ".hdrs"; # "/scratch0/igm3/florea/repeat/hg38c.fa.hdrs";
-
-# debug hg38c.Sim
-#$SET =  "ZFX.left";
-#$GROUPS = "/ccb/salz4-1/florea/repeat/Pipeline/SRR1284895sim/ZFX.left.groups";
-#$MATES = "/ccb/salz4-1/florea/repeat/Pipeline/SRR1284895sim/SRR1284895sim.nonconcordant.mates.fa";
-#$ANNOT = "/ccb/salz4-1/florea/repeat/Data/hg38c.Sim/hg38sim/transcriptome/gencode.v22.annotation.sim.gtf";
-#$GENOME = "/ccb/salz4-1/florea/repeat/Data/hg38c.Sim/hg38sim/hg38sim.fa";
-#$HDRS = $GENOME . ".hdrs"; 
+my $SIM4DB  = $ENV{SIM4DB};  
 
 
+($#ARGV>=4) or die "Usage: $0 prefix groupfile matesfastafile annotfile genomefile \n";
+my $SET     = shift; 
+my $GROUPS  = shift; 
+my $MATES   = shift; 
+my $ANNOT   = shift; 
+my $GENOME  = shift; 
+my $HDRS    = $GENOME . ".hdrs"; 
 
-# $SET = "test.groups1";
-
-# DEBUG ONLY
-#$GROUPS = "./groups"; # "./chr17.test/chr17.test.nonconcordant.genes.nr.sorted.groups";
-#$MATES  = "./chr17.test/chr17.test.nonconcordant.mates.fa";
-#$ANNOT  = "chr17.test/anno"; # "/home/florea/gencode.v22.annotation.gtf";
-#$GENOME = "/scratch0/igm3/florea/repeat/hg38c.fa";
-#$HDRS    = $GENOME . ".hdrs";
 
 my $ALU     = "GGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGGGAGGCCGAGGCGGGAGGATTGCTTGAGC" .
               "CCAGGAGTTCGAGACCAGCCTGGGCAACATAGCGAGACCCCGTCTCTACAAAAAATACAAAAATTAGCCG" .
@@ -144,55 +129,6 @@ sub process_Next_Prev # nannot annotlist
    }
 }
 
- 
-#my ($prev_tid,$prev_from,$prev_to);
-#open(F, "<$ANNOT") or die "$ANNOT";
-#while (<F>) {
-#   next if (/^#/ || !/\texon\t/);
-#   /transcript_id (\"\S+\");/ or die "died. $_";
-#   my $tid = $1;
-#   /^(\S+)\t\S+\t\S+\t(\d+)\t(\d+)\t\S+\t(\S)+/ or die "died. $_";
-#   my ($chrom,$from,$to,$ori) = ($1,$2,$3,$4);
-#   $TxptOri{$tid} = ($ori eq "+") ? 1 : -1;
-#   if (defined($prev_tid) && ($prev_tid eq $tid)) {
-#      my $x = "$chrom:$prev_from-$prev_to";
-#      if (($TxptOri{$tid}>0) && ($from>$prev_from)) {
-#         if (!defined($ExonFarNextPos{$x}) || ($ExonFarNextPos{$x}<$from)) { $ExonFarNextPos{$x} = $from; }
-#         if (!defined($ExonNextPos{$x})) {
-#            $ExonNextPos{$x} = "$from-$to";
-#         } elsif (!defined($Seen{"$prev_from-$prev_to;$from-$to"})) {
-#            $ExonNextPos{$x} .= ";$from-$to";
-#         }
-#         $x = "$chrom:$from-$to";
-#         if (!defined($ExonFarPrevPos{$x}) || ($ExonFarPrevPos{$x}>$prev_to)) { $ExonFarPrevPos{$x} = $prev_to; }
-#         if (!defined($ExonPrevPos{$x})) {
-#            $ExonPrevPos{$x} = "$prev_from-$prev_to";
-#         } elsif (!defined($Seen{"$prev_from-$prev_to;$from-$to"})) {
-#            $ExonPrevPos{$x} .= ";$prev_from-$prev_to";
-#         }
-#         $Seen{"$prev_from-$prev_to;$from-$to"} = 1;
-#      } else {
-#         ($TxptOri{$tid}<0) or die "died (ori). $tid\n";
-#         if (!defined($ExonFarPrevPos{$x}) || ($ExonFarPrevPos{$x}>$to)) { $ExonFarPrevPos{$x} = $to; }
-#         if (!defined($ExonPrevPos{$x})) {
-#            $ExonPrevPos{$x} = "$from-$to";
-#         } elsif (!defined($Seen{"$from-$to;$prev_from-$prev_to"})) {
-#            $ExonPrevPos{$x} .= ";$from-$to";
-#         }
-#         $x = "$chrom:$from-$to";
-#         if (!defined($ExonFarNextPos{$x}) || ($ExonFarNextPos{$x}<$prev_from)) { $ExonFarNextPos{$x} = $prev_from; }
-#         if (!defined($ExonNextPos{$x})) {
-#            $ExonNextPos{$x} = "$prev_from-$prev_to";
-#         } elsif (!defined($Seen{"$from-$to;$prev_from-$prev_to"})) {
-#            $ExonNextPos{$x} .= ";$prev_from-$prev_to";
-#         }
-#         $Seen{"$from-$to;$prev_from-$prev_to"} = 1;
-#      }
-#   }
-#   $prev_tid = $tid; $prev_from = $from; $prev_to = $to;
-#}  
-#close(F);
-    
 my %ReadMatchOri;
 
 ##### DETERMINE THE ORI OF THE MATCHED MATE;
@@ -233,7 +169,7 @@ while (<F>) {
    my $gaid = $GaId{$chrom};
 
    if (!defined($crtGAid) || ($gaid!=$crtGAid)) {
-      $ScaffSeq = `leaff -F $GENOME -s $gaid | tail -1`;
+      $ScaffSeq = `${SIM4DB}/leaff -F $GENOME -s $gaid | tail -1`;
       $ScaffSeq =~ tr/acgtn/ACGTN/;
       $revScaffSeq = reverse $ScaffSeq;
       $revScaffSeq =~ tr/acgtn/ACGTN/;
@@ -254,15 +190,26 @@ while (<F>) {
    }
    close(S);
    open(S, ">$SET.tmpreads.fa") or die "$SET.tmpreads.fa";
-   open(M, "leaff -Fdc $MATES -q $SET.tmpreads.ids |") or die "could not extract the reads.";
+   ##ERROR:Unknown option '-Fdc' open(M, "${SIM4DB}/leaff -Fdc $MATES -q $SET.tmpreads.ids |") or die "could not extract the reads.";
+   open(M, "${SIM4DB}/leaff -F $MATES -q $SET.tmpreads.ids |") or die "could not extract the reads.";
+   
    while (<M>) {
       chomp;
-      /^>(\S+).([12]) ([\S \t]+)$/ or die "died. $_";
-      my ($readid,$idx,$rest) = ($1,$2,$3);
+      # the header might hav emultiple blocks of info, or just the id; account for both
+      #print "linia: $_ \n";
+      
+      my ($readid,$idx,$rest);
+      if (/^>(\S+).([12]) ([\S \t]+)$/) {
+         ($readid,$idx,$rest) = ($1,$2,$3);
+      } elsif (/^>(\S+).([12])$/) {
+         ($readid,$idx) = ($1,$2);
+         # leave $rest undefined
+      }
+     # print "items: $readid,$idx,$rest\n"; exit;
       my $otheridx = 3-$idx;
       defined($ReadMatchOri{"$readid/$otheridx:$chrom:$from-$to"}) or die "undef ori for $readid/$otheridx:$chrom:$from-$to";
       my $sign = ($ReadMatchOri{"$readid/$otheridx:$chrom:$from-$to"} eq "-") ? "+" : "-";
-      print S ">$readid/$idx:$sign $rest\n";
+      print S ">$readid/$idx:$sign" . (defined($rest) ? " $rest\n" : "\n");
       $_ = <M>; print S $_;
    }
    close(M);
@@ -464,9 +411,9 @@ while (<F>) {
 
    # run the searches
    # option: -minid 80 -minlength 22
-   `sim4db -gen $SET.signal.fa -cdna $SET.tmpreads.fa -aligns -o - > $SET.tmpreads.signal.sim4db`;
-   `sim4db -gen $SET.unspliced.fa -cdna $SET.tmpreads.fa -aligns -o - > $SET.tmpreads.unspliced.sim4db`;
-   `sim4db -gen $SET.region.fa -cdna $SET.tmpreads.fa -aligns -o - > $SET.tmpreads.region.sim4db`;
+   `${SIM4DB}/sim4db -gen $SET.signal.fa -cdna $SET.tmpreads.fa -aligns -o - > $SET.tmpreads.signal.sim4db`;
+   `${SIM4DB}/sim4db -gen $SET.unspliced.fa -cdna $SET.tmpreads.fa -aligns -o - > $SET.tmpreads.unspliced.sim4db`;
+   `${SIM4DB}/sim4db -gen $SET.region.fa -cdna $SET.tmpreads.fa -aligns -o - > $SET.tmpreads.region.sim4db`;
    `cat $SET.tmpreads.signal.sim4db >> $SET.SIGNAL.sim4db`;
    `cat $SET.tmpreads.unspliced.sim4db >> $SET.UNSPLICED.sim4db`;
    `cat $SET.tmpreads.region.sim4db >> $SET.REGION.sim4db`;

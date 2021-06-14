@@ -1,18 +1,29 @@
 #!/usr/bin/perl
 use strict;
 
+my $MINALULEN = 20;
+
 # Note: At least one of -k or -d must be specified, possibly both
-($#ARGV>=2) or die "Usage: $0 -k kraken_prefix out_prefix [-u] < samfile\n";
-my ($krakenPrefix,$outPrefix,$uniq);
-$krakenPrefix = shift;
-if ($krakenPrefix eq "-k") {
-   $krakenPrefix = shift;
-} else {
-    die "Usage: $0 -k kraken_prefix out_prefix [-u] < samfile\n";
+($#ARGV>=2) or die "Usage(1): $0 [-k kraken_prefix] [-d Alusim4dbprefix] [-o out_prefix] [-u] < samfile\n";
+my ($krakenPrefix,$alusim4dbPrefix,$outPrefix,$uniq);
+my $argtmp;
+while (@ARGV) {
+   $argtmp = shift;
+   if ($argtmp eq "-k") {
+       $krakenPrefix = shift;
+   } elsif ($argtmp eq "-d") {
+       $alusim4dbPrefix = shift;
+   } elsif ($argtmp eq "-o") {
+       $outPrefix = shift;
+   } elsif ($argtmp eq "-u") {
+       $uniq = 1; 
+   } else {
+       die "Usage(2): $0 [-k kraken_prefix] [-d alusim4dbprefix] [-o out_prefix] [-u] < samfile\n";
+   }
 }
-$outPrefix = shift;
-$uniq = shift;
-!defined($uniq) or ($uniq eq "-u") or die "Usage: $0 -k kraken_prefix out_prefix [-u] < samfile\n";
+
+#!defined($uniq) or die "Usage(3): $0 [-k kraken_prefix] [-d alusim4dbprefix] [-o out_prefix] [-u] < samfile\n";
+defined($krakenPrefix) or defined($alusim4dbPrefix) or die "Did not specify a classification file. \nUsage(4): $0 [-k kraken_prefix] [-d alusim4dbprefix] [-o out_prefix] [-u] < samfile\n";
 
 my $L =  10000;
 
@@ -23,6 +34,10 @@ my $L =  10000;
 #                  per align: discordant_align && ((m1 && Alu(m2)) || (m2 && Alu(m1)) && isPrimary (optional), add alignment to NCLines
 #                  per block: print CLines; if (!hasConcordant) { print $NCLines; }
 
+### Allow Alu information from two sources (either or both); sim4db ALU alignments and Kraken classification
+#
+#
+#### Kraken information:
 my %Alu;
 
 # read in the two (paired) lists of kraken files
@@ -48,6 +63,50 @@ if (defined($krakenPrefix)) {
    }
    close(F);
 }
+
+my %Alu4;
+
+# read in the two (paired) lists of sim4db ALU alignment files; Example: SRR1284895sim_1.Alu.sim4db.stats
+# SRR1284895.5018 ALU 30 100 + 30.00 - OLD; see below
+if (defined($alusim4dbPrefix)) {
+   my $tmp4File = $alusim4dbPrefix . "_1.Alu.sim4db.coords.stats";
+   open(F, "<$tmp4File") or die "could not open sim4db Alu alignments file $tmp4File.\n";
+   while (<F>) {
+      chomp;
+      #tid ganame beg end gabeg gaend cov len relori pctcov pctid
+      #ERR127302.129 ALU 17 72 1 56 56 72 + 77.78 89
+      /^(\S+)\sALUY?\s\d+\s\d+\s\d+\s\d+\s(\d+)\s\d+\s\S\s\S+\s\d+$/ or die "died (alusim4db). $_";
+      if ($2>=$MINALULEN) { $Alu4{$1} = 1; }
+   }
+   close(F);
+
+   $tmp4File = $alusim4dbPrefix . "_2.Alu.sim4db.coords.stats";
+   open(F, "<$tmp4File") or die "could not open sim4db Alu alignments file $tmp4File.\n";
+   while (<F>) {
+      chomp;
+      /^(\S+)\sALUY?\s\d+\s\d+\s\d+\s\d+\s(\d+)\s\d+\s\S\s\S+\s\d+$/ or die "died (alusim4db). $_";
+      if ($2>=$MINALULEN) {
+         if (defined($Alu{$1})) { $Alu{$1} = 3; } else { $Alu{$1} = 2; }
+      }
+   }
+   close(F);
+}
+
+### Now reconcile all information about ALU match in the %Alu data structure; when both criteria used, then both must show match
+if (defined($krakenPrefix) && defined($alusim4dbPrefix)) {
+   foreach my $k (keys %Alu) {
+      next if ($Alu{$k} == $Alu4{$k});
+      if (!defined($Alu4{$k})) { undef $Alu{$k}; next; }   # strip the label if not confirmed by sim4db
+      # strip the label if incompatible
+      if ($Alu{$k}+$Alu4{$k} == 3) { undef $Alu{$k}; next; }
+      if ($Alu{$k}>$Alu4{$k}) { $Alu{$k} = $Alu4{$k}; }  # Basically, here Alu{$K} is 3, and restrict to what sim4db says
+      # the only remaining cases are 1,3 and 1,2 which stay as they are; no correction
+   }
+} elsif (defined($alusim4dbPrefix)) {
+   foreach my $k (keys %Alu4) {
+      $Alu{$k} == $Alu4{$k};
+   }
+} # otherwise leave Alu as is, as the only criterion (kraken-based)
 
 open(C, ">$outPrefix.concordant.sam") or die "could not open concordant for writing.\n";
 open(NC, ">$outPrefix.nonconcordant.sam") or die "could not open nonconcordant for writing.\n";

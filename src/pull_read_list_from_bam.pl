@@ -51,8 +51,14 @@ else {
    open (F1,"<$fqFile1") or die "$fqFile1.\n";
 }
 while (<F1>) {
-   /^@(\S+)( .*)/ or die "died (2). $_";
    my ($readid,$rest) = ($1,$2);
+   if (/^@(\S+)( .*)/) {
+      ($readid,$rest) = ($1,$2);
+   } elsif (/^@(\S+)$/) {
+      ($readid,$rest) = ($1,$2);
+   } else {
+      die "died (2). $_";
+   }
 
    $fq = "\@$1/" . $idx . "$rest\n";
    $_  = <F1>; $fq.= $_;
@@ -73,8 +79,14 @@ else {
    open (F2,"<$fqFile2") or die "$fqFile2.\n";
 }
 while (<F2>) {
-   /^@(\S+)( .*)/ or die "died (3). $_";
    my ($readid,$rest) = ($1,$2);
+   if (/^@(\S+)( .*)/) { 
+      ($readid,$rest) = ($1,$2);
+   } elsif (/^@(\S+)$/) {
+      ($readid,$rest) = ($1,$2);
+   } else {
+      die "died (3). $_";
+   }
 
    $fq= "\@$1/" . $idx . "$rest\n";
    $_ = <F2>; $fq.= $_;

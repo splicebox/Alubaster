@@ -8,8 +8,6 @@ my $PCTID = shift;
 
 my %Seen;
 
-# NOTE: m1ori and type are redundant; m1ori refers to the type of region, not to the original read orientation!!!
-
 my $last_key;
 # read in a sorted REGION stats file
 while (<>) {

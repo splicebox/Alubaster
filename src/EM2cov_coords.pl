@@ -17,21 +17,27 @@ while (<>) {
   my ($len,$pctid,$relori) = ($1,$2,$3);
   $relori = ($relori eq "complement") ? "-" : "+";
   $_ = <>; chomp;
-  /^edef=>(\S+)\s/ or die "died (edef). $_";
+  if ( ($_ !~ m/^edef=(\S+)\s/) and ($_ !~ m/^edef=(\S+)$/) ){die "died (edef). $_";}
+ 
   my $tid = $1;
   $_ = <>; chomp;
-  /^ddef=>(\S+)$/ or die "died (ddef). $_";
-  my $ganame = $1;
+  my $ganame;
+  if (/^ddef=(\S+)$/) { $ganame = $1; }
+  elsif (/^ddef=(\S+)\s/) { $ganame = $1; } 
+  else { die "died (ddef). $_"; }
   my $cov = 0;
+  my ($beg,$end,$gabeg,$gaend);
   while (<>) {
     last if /^sim4end/; 
     next if /^[\-actgnACGTN]/;
-    /^(\d+)\-(\d+) / or die "died (cDNA). $_";
-    $cov =+ ($2-$1+1);
+    /^(\d+)\-(\d+) \((\d+)\-(\d+)\) / or die "died (cDNA). $_";
+    my ($a,$b,$c,$d) = ($1,$2,$3,$4);
+    $cov += ($b-$a+1);
+    if (!defined($beg)) { $beg = $a; $gabeg = $c; }
+    $end = $b;
+    $gaend = $d;
   }
-  print "$tid $ganame $cov $len $relori ";
-  printf "%1.2f %1.2n\n", 100*$cov/(1.0*$len), $pctid;
+  if ($relori eq "-") { my $tmp = $len-$beg+1; $beg = $len-$end+1; $end = $tmp; }
+  print "$tid $ganame $beg $end $gabeg $gaend $cov $len $relori ";
+  printf "%1.2f %d\n", 100*$cov/(1.0*$len), $pctid;
 }
-
-    
-

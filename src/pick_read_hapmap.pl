@@ -16,7 +16,7 @@ open(T, "<$ANNOT") or die "txpt2gene.\n";
 while (<T>) {
   # "ENSG00000000003.13"; "ENST00000373020.7"; "TSPAN6";
   /^\"(\S+)\"; \"(\S+)\"; \"(\S+)\";$/ or die "died. $_";
-  $Txpt2Gene{">$1:$2"} = $3;
+  $Txpt2Gene{"$1:$2"} = $3;
 }
 close(T);
 
@@ -24,7 +24,7 @@ open(R, "<$REGIONfile") or die "REGION: $REGIONfile\n";
 while (<R>) {
    chomp;
 
-   # ERR188081.25054577 >ENSG00000000457.12:ENST00000367771.9;chr1:169823606-169827746 No .
+   # ERR188081.25054577 ENSG00000000457.12:ENST00000367771.9;chr1:169823606-169827746 No .
    next if / No/;
    /^(\S+ \S+) Yes/ or die "died. $_";
    $isREGION{$1} = 1;       
@@ -35,7 +35,7 @@ open(U, "<$UNSPLICEDfile") or die "UNSPLICED: $UNSPLICEDfile\n";
 while (<U>) {
    chomp;
 
-   # ERR188081.25054577 >ENSG00000000457.12:ENST00000367771.9;chr1:169823606-169827746 No
+   # ERR188081.25054577 ENSG00000000457.12:ENST00000367771.9;chr1:169823606-169827746 No
    next if / No/;
    /^(\S+ \S+) Yes/ or die "died. $_";     
    $isUNSPLICED{$1} = 1;
@@ -45,7 +45,7 @@ close(U);
 open(S, "<$SIGNALfile") or die "SIGNAL: $SIGNALfile\n";
 while (<S>) {
    chomp;
-   # ERR188081.10000020 >ENSG00000000457.12:ENST00000367771.9;chr1:169823606-169827746 No
+   # ERR188081.10000020 ENSG00000000457.12:ENST00000367771.9;chr1:169823606-169827746 No
    next if /No/;
    /^(\S+ \S+) / or die "died. $_";
    my $key = $1;

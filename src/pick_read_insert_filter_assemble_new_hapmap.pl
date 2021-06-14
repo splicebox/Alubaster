@@ -18,8 +18,7 @@ my $Usage =
 ";
 ($#ARGV>2) or die $Usage;
 
-my $Txpt2GeneFile = "/ccb/salz4-1/florea/repeat/Data/gencode.v22.Txpt2Gene";
-#my $OverlapsFile = "SRR1284895sim/SRR1284895sim.nonconcordant.genes.SORTED.bed";
+my $Txpt2GeneFile = $ENV{TXPT2GENE};
 
 my $isEnum = 1;
 my $isDebug = 0;
@@ -71,8 +70,8 @@ open(F, "<$SelectionFile") or die "Could not open selection file $SelectionFile.
 while (<F>) {
    chomp;
 
-   #>SRR1284895.19496361/2:- >ENSG00000000003.13:ENST00000612152.3;chrX:100620211-100623088 Yes TSPAN6
-   /^>(\S+)(\d):\S >(\S+):\S+;\S+ Yes (\S+)$/ or die "died. $_";
+   #SRR1284895.19496361/2:- ENSG00000000003.13:ENST00000612152.3;chrX:100620211-100623088 Yes TSPAN6
+   /^(\S+)(\d):\S (\S+):\S+;\S+ Yes (\S+)$/ or die "died. $_";
    my ($readid,$idx,$geneid,$genename)= ($1,$2,$3,$4);
    $readid = $readid . (3-$idx); 
    $isSignal{"$geneid:$readid"} = 1;
@@ -85,9 +84,9 @@ open(F, "<$SignalFile") or die "Could not open SIGNAL file $SignalFile.\n";
 while (<F>) {
    chomp;
 
-   # >SRR1284895.123549302/2:+ >ENSG00000000003.13:ENST00000612152.3;chrX:100620211-100623088 No 
+   # SRR1284895.123549302/2:+ ENSG00000000003.13:ENST00000612152.3;chrX:100620211-100623088 No 
    next if !/Yes/;
-   /^>(\S+)(\d):\S >(\S+):\S+;\S+/ or die "died. $_";
+   /^(\S+)(\d):\S (\S+):\S+;\S+/ or die "died. $_";
    my ($readid,$idx,$geneid) = ($1,$2,$3);
    $readid = $readid . (3-$idx);
    $isCandidate{"$geneid:$readid"} = 1;
@@ -100,9 +99,9 @@ open(F, "<$RegionFile") or die "Could not open REGION file $RegionFile.\n";
 while (<F>) {
    chomp;
 
-   # >SRR1284895.161017365/2:- >ENSG00000000003.13:ENST00000612152.3;chrX:100620211-100623088 Yes Unspliced
+   # SRR1284895.161017365/2:- ENSG00000000003.13:ENST00000612152.3;chrX:100620211-100623088 Yes Unspliced
    next if !/ Yes/;
-   /^>(\S+)(\d):\S >(\S+):\S+;\S+/ or die "died. $_";
+   /^(\S+)(\d):\S (\S+):\S+;\S+/ or die "died. $_";
    my ($readid,$idx,$geneid) = ($1,$2,$3);
    $readid = $readid . (3-$idx);
    $isRegionUnspliced{"$geneid:$readid"} = 1;
@@ -113,9 +112,9 @@ open(F, "<$UnsplicedFile") or die "Could not open UNSPLICED file $UnsplicedFile.
 while (<F>) {
    chomp;
 
-   # >SRR1284895.161017365/2:- >ENSG00000000003.13:ENST00000612152.3;chrX:100620211-100623088 Yes
+   # SRR1284895.161017365/2:- ENSG00000000003.13:ENST00000612152.3;chrX:100620211-100623088 Yes
    next if !/ Yes/;
-   /^>(\S+)(\d):\S >(\S+):\S+;\S+/ or die "died. $_";
+   /^(\S+)(\d):\S (\S+):\S+;\S+/ or die "died. $_";
    my ($readid,$idx,$geneid) = ($1,$2,$3);
    $readid = $readid . (3-$idx);
    $isRegionUnspliced{"$geneid:$readid"} = 1;
@@ -137,6 +136,7 @@ close(F);
 my %Seen;
 my $lastgene;
 my $lastchrom;
+my $Lines;
 my @signals_plus;
 my @signalnone_plus;
 my @regionunspliced_plus;
@@ -146,7 +146,7 @@ my @signalnone_minus;
 my @regionunspliced_minus;
 my @signalregionunspliced_minus;
 
-$prefix = "AA"; #"SRR1284895sim";
+#$prefix = "AA"; #"SRR1284895sim";
 open(S, ">$prefix.signals.bed") or die "signals.bed";
 open(SN, ">$prefix.signalnone.bed") or die "signalnone.bed";
 open(RU, ">$prefix.regionunspliced.bed") or die "regionunspliced.bed";
@@ -183,11 +183,12 @@ while (<F>) {
              &print_debug("$lastgene", "SRU", "+", $chrom, $tmp_clusters_signalregionunspliced_minus);
           }
 
-          &find_insertion_loc_filter($lastgene,$lastchrom,$tmp_clusters_signal_plus,$tmp_clusters_signalnone_plus,$tmp_clusters_regionunspliced_plus,$tmp_clusters_signalregionunspliced_plus,$tmp_clusters_signal_minus,$tmp_clusters_signalnone_minus,$tmp_clusters_regionunspliced_minus,$tmp_clusters_signalregionunspliced_minus);
+          &find_insertion_loc_filter($lastgene,$lastchrom,$tmp_clusters_signal_plus,$tmp_clusters_signalnone_plus,$tmp_clusters_regionunspliced_plus,$tmp_clusters_signalregionunspliced_plus,$tmp_clusters_signal_minus,$tmp_clusters_signalnone_minus,$tmp_clusters_regionunspliced_minus,$tmp_clusters_signalregionunspliced_minus,$Lines);
           # print "$lastgene $lastchrom $from $to\n";
       }
       $lastgene = $Txpt2Gene{$tid};
       $lastchrom = $chrom;
+      $Lines = "";
       @signals_plus = (); @signalnone_plus = (); @regionunspliced_plus = (); @signalregionunspliced_plus = ();
       @signals_minus = (); @signalnone_minus = (); @regionunspliced_minus = (); @signalregionunspliced_minus = ();
    }
@@ -199,6 +200,8 @@ while (<F>) {
 
    # add read to the clusters, if not Seen; mark them as Seen;
    # if SIgnal read, only record the last interval in the signals array, and both intervals in teh signalnone array; all others, record all intervals
+   $Lines .= $_ . "\n";
+
    my @xlens = split ',', $xlen;
    my @xoffsets =  split ',', $xoffset;
    if ($ori eq "+") {
@@ -273,7 +276,7 @@ if (defined($lastgene)) {
       &print_debug("$lastgene", "SRU", "-", $lastchrom, $tmp_clusters_signalregionunspliced_minus);
    }
 
-   my ($from,$to) = &find_insertion_loc_filter($lastgene,$lastchrom,$tmp_clusters_signal_plus,$tmp_clusters_signalnone_plus,$tmp_clusters_regionunspliced_plus,$tmp_clusters_signalregionunspliced_plus,$tmp_clusters_signal_minus,$tmp_clusters_signalnone_minus,$tmp_clusters_regionunspliced_minus,$tmp_clusters_signalregionunspliced_minus);
+   my ($from,$to) = &find_insertion_loc_filter($lastgene,$lastchrom,$tmp_clusters_signal_plus,$tmp_clusters_signalnone_plus,$tmp_clusters_regionunspliced_plus,$tmp_clusters_signalregionunspliced_plus,$tmp_clusters_signal_minus,$tmp_clusters_signalnone_minus,$tmp_clusters_regionunspliced_minus,$tmp_clusters_signalregionunspliced_minus,$Lines);
 }
 close(F); 
 
@@ -316,8 +319,8 @@ sub cluster_counts {
 }
 
 sub byPair {
-   my @temp_a = split $a, ':';
-   my @temp_b = split $b, ':';
+   my @temp_a = split ':', $a;
+   my @temp_b = split ':', $b;
 
    if ($temp_a[0]!=$temp_b[0]) { $temp_a[0] <=> $temp_b[0]; }
    else { $temp_a[1] <=> $temp_b[1]; }
@@ -327,7 +330,7 @@ sub max { return (($_[0]>=$_[1]) ? $_[0] : $_[1]); }
 
 
 
-sub find_insertion_loc_filter { # geneid chrom $tmp_clusters_signal+,$tmp_clusters_signalnone+,$tmp_clusters_regionunspliced+,$tmp_clusters_signalregionunspliced+,$tmp_clusters_signal-,$tmp_clusters_signalnone-,$tmp_clusters_regionunspliced-,$tmp_clusters_signalregionunspliced-
+sub find_insertion_loc_filter { # geneid chrom $tmp_clusters_signal+,$tmp_clusters_signalnone+,$tmp_clusters_regionunspliced+,$tmp_clusters_signalregionunspliced+,$tmp_clusters_signal-,$tmp_clusters_signalnone-,$tmp_clusters_regionunspliced-,$tmp_clusters_signalregionunspliced-,Lines
     my ($From,$To);
 
     my $geneid = shift;
@@ -340,6 +343,7 @@ sub find_insertion_loc_filter { # geneid chrom $tmp_clusters_signal+,$tmp_cluste
     my $tmp_clusters_signalnone_minus = shift;
     my $tmp_clusters_regionunspliced_minus = shift;
     my $tmp_clusters_signalregionunspliced_minus = shift;
+    my $Lines = shift;
 
     my @signalFplus = (); my @signalTplus = (); my @signalCplus = ();
     my @signalFminus = (); my @signalTminus = (); my @signalCminus = ();
@@ -349,6 +353,10 @@ sub find_insertion_loc_filter { # geneid chrom $tmp_clusters_signal+,$tmp_cluste
     my @regionunsplicedFminus = (); my @regionunsplicedTminus = (); my @regionunsplicedCminus = ();
     my @signalregionunsplicedFplus = (); my @signalregionunsplicedTplus = (); my @signalregionunsplicedCplus = ();
     my @signalregionunsplicedFminus = (); my @signalregionunsplicedTminus = (); my @signalregionunsplicedCminus = ();
+
+    my @signalIDplus = (); my @signalIDminus = ();
+    my @signalnoneIDplus = (); my @signalnoneIDminus = ();
+    my @regionunsplicedIDplus = (); my @regionunsplicedIDminus = ();
 
     my @elems = split ',', $tmp_clusters_signal_plus;
     foreach my $x (@elems) {
@@ -394,6 +402,85 @@ sub find_insertion_loc_filter { # geneid chrom $tmp_clusters_signal+,$tmp_cluste
        push @signalregionunsplicedFminus, $1; push @signalregionunsplicedTminus, $2; push @signalregionunsplicedCminus, $3;
     }
 
+    # now assign readids to intervals
+    my @elems = split '\n', $Lines;
+#   print "<<<$Lines>>>\n";
+    foreach my $l (@elems) {
+       $l =~ /^(\S+)\t(\d+)\t(\d+)\t(\S+)\t\S+\t(\S)\t\d+\t\d+\t\S+\t(\d+)\t(\S+)\t(\S+)\t\S+\t\d+\t\d+\t(\S+)\t/ or die "died. $l";
+       my ($chrom,$from,$to,$readid,$ori,$nexons,$xlen,$xoffset,$tid) = ($1,$2,$3,$4,$5,$6,$7,$8,$9);
+
+       my @xlens = split ',', $xlen;
+       my @xoffsets =  split ',', $xoffset;
+       if ($ori eq "+") {
+         # foreach exon, find (an) interval
+         for (my $j=0; $j<$nexons; $j++) {
+
+           # find the interval
+           if (defined($isRegionUnspliced{"$geneid:$readid"})) {
+              for (my $i=0; $i<scalar(@regionunsplicedFplus); $i++) {
+                 if (($regionunsplicedFplus[$i]<=$from+$xoffsets[$j]) && ($from+$xoffsets[$j]<=$regionunsplicedTplus[$i])) {
+                    $regionunsplicedIDplus[$i] .= ",$readid";
+                    last;
+                 }
+              }
+           } elsif (defined($isSignal{"$geneid:$readid"})) {
+              for (my $i=0; $i<scalar(@signalFplus); $i++) { 
+                 if (($signalFplus[$i]<=$from+$xoffsets[$j]) && ($from+$xoffsets[$j]<=$signalTplus[$i])) {
+                    $signalIDplus[$i] .= ",$readid";
+                    last;
+                 }
+              }
+              for (my $i=0; $i<scalar(@signalnoneFplus); $i++) {         
+                 if (($signalnoneFplus[$i]<=$from+$xoffsets[$j]) && ($from+$xoffsets[$j]<=$signalnoneTplus[$i])) {
+                    $signalnoneIDplus[$i] .= ",$readid";
+                    last;
+                 }
+              }
+           } else { 
+              for (my $i=0; $i<scalar(@signalnoneFplus); $i++) {
+                 if (($signalnoneFplus[$i]<=$from+$xoffsets[$j]) && ($from+$xoffsets[$j]<=$signalnoneTplus[$i])) {
+                    $signalnoneIDplus[$i] .= ",$readid";
+                    last;
+                 }
+              }
+           }
+         }
+       # minus strand
+       } elsif ($ori eq "-") {
+         for (my $j=0; $j<$nexons; $j++) {
+
+           #find the interval
+           if (defined($isRegionUnspliced{"$geneid:$readid"})) {
+             for (my $i=0; $i<scalar(@regionunsplicedFminus); $i++) {
+               if (($regionunsplicedFminus[$i]<=$from+$xoffsets[$j]) && ($from+$xoffsets[$j]<=$regionunsplicedTminus[$i])) {
+                  $regionunsplicedIDminus[$i] .= ",$readid";
+                  last;
+               }
+             }
+           } elsif (defined($isSignal{"$geneid:$readid"})) {
+             for (my $i=0; $i<scalar(@signalFminus); $i++) {
+               if (($signalFminus[$i]<=$from+$xoffsets[$j]) && ($from+$xoffsets[$j]<=$signalTminus[$i])) {
+                  $signalIDminus[$i] .= ",$readid";
+                  last;
+               }
+             }
+             for (my $i=0; $i<scalar(@signalnoneFminus); $i++) {
+               if (($signalnoneFminus[$i]<=$from+$xoffsets[$j]) && ($from+$xoffsets[$j]<=$signalnoneTminus[$i])) {
+                  $signalnoneIDminus[$i] .= ",$readid";
+                  last;
+               }
+             }
+           } else {
+               for (my $i=0; $i<scalar(@signalnoneFminus); $i++) {
+                  if (($signalnoneFminus[$i]<=$from+$xoffsets[$j]) && ($from+$xoffsets[$j]<=$signalnoneTminus[$i])) {
+                     $signalnoneIDminus[$i] .= ",$readid";
+                     last;
+                  }
+               }
+           }
+         } # for j
+       } # ori eq "-:
+    } # top
 
     @elems = ();
 
@@ -445,18 +532,30 @@ sub find_insertion_loc_filter { # geneid chrom $tmp_clusters_signal+,$tmp_cluste
        my $st = &filter($geneid,$snum,$snnum,$runum,$srunum);
 
        if ($st) {
+          my $j;
+          foreach ($j=0; $j<scalar(@signalnoneFplus); $j++) {
+            last if (($signalnoneFplus[$j]<=$signalFplus[$i]) && ($signalTplus[$i]<=$signalnoneTplus[$j]));
+          }
+          ($j<scalar(@signalnoneFplus)) or die "Unexpected (1-2): $chrom $j>=", scalar(@signalnoneFplus), "<<<", $signalFplus[$i],":",$signalTplus[$i],">>>!!!",
+                                               join(',', @signalnoneFplus), ";", join(',', @signalnoneTplus),"!!!\n"; 
+
+
           if (!$isPaired) { # report end of plus cluster, +inf
-             print "(1) ", $GeneId2Name{$geneid}, " $geneid $chrom ", $signalTplus[$i], " ", "+inf [$snum $snnum $runum $srunum]\n";
+             print "(1) ", $GeneId2Name{$geneid}, " $geneid $chrom ", $signalTplus[$i], " ", "+inf [$snum $snnum $runum $srunum] ";
+             # print "[", $signalIDplus[$i], "]\n"; 
+             print "[", $signalnoneIDplus[$j], "]\n"; 
           } else {  # found
              # what if too far? LLL - might need to look at next exon
              if ($signalnoneFminus[$pi]-$signalTplus[$i]<25000) {
-                 print "(2) ", $GeneId2Name{$geneid}, " $geneid $chrom ", $signalTplus[$i], " ", $signalnoneFminus[$pi], " [$snum $snnum $runum $srunum]\n";
+                 print "(2) ", $GeneId2Name{$geneid}, " $geneid $chrom ", $signalTplus[$i], " ", $signalnoneFminus[$pi], " [$snum $snnum $runum $srunum] ";
+                 #print "[", $signalIDplus[$i], ";",$signalnoneIDminus[$pi], "]\n";
+                 print "[", $signalnoneIDplus[$j], ";",$signalnoneIDminus[$pi], "]\n";
              }
           }
        }
    }
 
-   #### Now the - strand signals - moght report duplicates of above, but ok, willsolve later LLL
+   #### Now the - strand signals - might report duplicates of above, but ok, willsolve later LLL
    foreach (my $i=0; $i<scalar(@signalFminus); $i++) {
       my ($j,$pi);
         
@@ -507,12 +606,23 @@ sub find_insertion_loc_filter { # geneid chrom $tmp_clusters_signal+,$tmp_cluste
       my $st = &filter($geneid,$snum,$snnum,$runum,$srunum);
 
       if ($st) {
+          my $j;
+          foreach ($j=0; $j<scalar(@signalnoneFminus); $j++) {
+            last if (($signalnoneFminus[$j]<=$signalFminus[$i]) && ($signalTminus[$i]<=$signalnoneTminus[$j]));
+          }  
+          ($j<scalar(@signalnoneFminus)) or die "Unexpected (3-4): $chrom $j>=", scalar(@signalnoneFminus), "<<<",$signalFminus[$i],":",$signalTminus[$i],">>>!!!",
+                                               join(':', @signalnoneFminus), ",", join(':', @signalnoneTminus),"!!!\n";
+
           if (!$isPaired) { # report -inf, start of minus cluster
-             print "(3) ", $GeneId2Name{$geneid}, " $geneid $chrom -inf ", $signalFminus[$i], " [$snum $snnum $runum $srunum]\n";
+             print "(3) ", $GeneId2Name{$geneid}, " $geneid $chrom -inf ", $signalFminus[$i], " [$snum $snnum $runum $srunum] ";
+             #print "[", $signalIDminus[$i], "]\n";
+             print "[", $signalnoneIDminus[$j], "]\n";
           } else {  # pair cluster found
              # what if too far? LLL - might need to look at next exon
              if ($signalFminus[$i]-$signalnoneTplus[$pi]<25000) {
-                print "(4) ", $GeneId2Name{$geneid}, " $geneid $chrom ", $signalnoneTplus[$pi], " ", $signalFminus[$i], " [$snum $snnum $runum $srunum]\n";
+                print "(4) ", $GeneId2Name{$geneid}, " $geneid $chrom ", $signalnoneTplus[$pi], " ", $signalFminus[$i], " [$snum $snnum $runum $srunum] ";
+                #print "[", $signalnoneIDplus[$pi], ";", $signalIDminus[$i], "]\n";
+                print "[", $signalnoneIDplus[$pi], ";", $signalnoneIDminus[$j], "]\n";
              } 
           }
       }

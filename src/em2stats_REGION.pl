@@ -22,12 +22,15 @@ while (<>) {
   $ori = ($ori eq "forward") ? "+" : "-";
 
   $_ = <>; chomp;
-  /^edef=(\S+)\s/ or die "died (edef). $_";
-  my $tid = $1;
+  # write the code to accomodate both multi-word (original) and single word (unmapped_realign) edef lines
+  my $tid;
+  if (/^edef=(\S+)\s/) { $tid = $1;} 
+  elsif (/^edef=(\S+)$/) { $tid = $1;} 
+  else { die "died (edef). $_"; }
   $_ = <>; chomp;
   my $dline = $_;
   # ddef=>"ENST00000629041.1";chr1:45581219-45581278 m1rev:(m1-5000):45576219 (GA)
-# /^ddef=(\S+) (m1\w\w\w):\(\S+\):(\d+) \((\S\S)\)$/ or die "died (ddef). $_";     HERE, last parenthesis
+# /^ddef=(\S+) (m1\w\w\w):\(\S+\):(\d+) \((\S\S)\)$/ or die "died (ddef). $_";
   /^ddef=(\S+) (m1\w\w\w):\(\S+\):(\d+) \((\S\S)/ or die "died (ddef). $_";
   my ($ganame,$m1ori,$pos,$type) = ($1,$2,$3,$4);
 
@@ -61,7 +64,6 @@ while (<>) {
   # parse these from the dline
   # ddef=>"ENST00000629041.1";chr1:45581219-45581278 m1rev:(m1-5000):45576219 (GA)
   # ddef=>ENSG00000280279.1:ENST00000623180.1;chr17:65830-65887 m1fwd:(m1+71366+100):71466 (AG)
-# $dline =~ /\S+;\S+:(\d+)\-(\d+) m1\S+:\S+:(\d+) / or die "died (dline). $dline";  HERE, last parenthesis
   $dline =~ /\S+;\S+:(\d+)\-(\d+) m1\S+:\S+:(\d+) / or die "died (dline). $dline";
   my ($L1,$L2);
   if ($type eq "AG") {

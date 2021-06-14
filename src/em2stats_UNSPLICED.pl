@@ -23,12 +23,15 @@ while (<>) {
   $ori = ($ori eq "forward") ? "+" : "-";
 
   $_ = <>; chomp;
-  /^edef=(\S+)\s/ or die "died (edef). $_";
-  my $tid = $1;
+  # rewrite this to allow for both multi-word (unmapped_realign) and single word (original) edef lines
+  my $tid;
+  if (/^edef=(\S+)\s/) { $tid = $1; }
+  elsif (/^edef=(\S+)$/) { $tid = $1; }
+  else { die "died (edef). $_"; }
   $_ = <>; chomp;
   my $dline = $_;
   # ddef=>"ENST00000367042.4";chr1:207793519-207795513 m1fwd:(m1+500):207796013 (AU)
-# /^ddef=(\S+) (m1\S+):\S+:\d+ \((\S\S)\)$/ or die "died (ddef). $_";  HERE, last parenthesis
+# /^ddef=(\S+) (m1\S+):\S+:\d+ \((\S\S)\)$/ or die "died (ddef). $_";  
   /^ddef=(\S+) (m1\S+):\S+:\d+ \((\S\S)/ or die "died (ddef). $_";
   my ($ganame,$m1ori,$type) = ($1,$2,$3);
 

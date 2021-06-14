@@ -8,8 +8,6 @@ my $PCTID = shift;
 
 my %Seen; # 1 if good match found ('Yes')
 
-# NOTE: m1ori and type are redundant; m1ori refers to the type of region, not to the original read orientation!!!
-
 my $last_key;
 # read in a sorted UNSPLICED stats file
 while (<>) {

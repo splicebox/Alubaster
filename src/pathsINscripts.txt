@@ -1,0 +1,9 @@
+scripts with paths to modify:
+
+call_assembly.pl   : SCRIPTS, OASES , VELVETH/G    ----done
+parse_screened.pl  : SCRIPTS, SIM4DB    ----done
+patch_R.sh         : ???
+pick_read_insert_filter_assemble_new_hapmap.pl 
+   : $Txpt2GeneFile = "/scratch/groups/lflorea1/shared/genomes/forAlubaster/gencode.v22.Txpt2Gene"; ----done
+run_parse.pl       : gets as param the PATH to scripts and REF files!!!     ----done
+search_signal.pl   : gets as param the PATH to scripts and REF files!!!    ----done
