@@ -1,10 +1,17 @@
 ## Alubaster
-Detection of novel Alu exonization events from RNA-seq data
+Detection of novel *Alu* exonization events from RNA-seq data
 
-Copyright (C) 2018- and GNU GPL v3.0 by Liliana Florea, Lindsay Payer
+Described in:
+  Florea L, Payer L, Antonescu C, Yang G and Burns K. (2021) Detection of Alu exonization events in human frontal cortex from RNA-seq data, *Submitted*.
+
+Supplementary data described in the article can be found in the '[alubaster_paper](https://github.com/splicebox/ALubaster/tree/master/alubaster_paper)' directory.
+
+```
+Copyright (C) 2018-2021 and GNU GPL v3.0 by Liliana Florea, Lindsay Payer
+```
 
 ### Synopsis
-Alubaster identifies candidate gene loci by locating mapped reads (‘anchors’) whose Alu-containing mates could not be found in the genome. It then applies two types of filters to select a more accurate subset of loci. The first, a *signal filter*, identifies read evidence for an Alu exonization event, by searching the mate’s sequence against a concatenation of the neighboring exons’ and Alu sequences while concomitantly ruling out false positive matches that could have resulted from local or more distant Alus in the genome. The second, a *context filter*, evaluates the likelihood of an event based on the strength of the signal versus the local context, in particular repeat content and proportion of signal-to-‘context’ matches. 
+Alubaster identifies candidate gene loci by locating mapped reads (‘anchors’) whose *Alu*-containing mates could not be found in the genome. It then applies two types of filters to select a more accurate subset of loci. The first, a *signal filter*, identifies read evidence for an Alu exonization event, by searching the mate’s sequence against a concatenation of the neighboring exons’ and *Alu* sequences while concomitantly ruling out false positive matches that could have resulted from local or more distant *Alu* elements in the genome. The second, a *context filter*, evaluates the likelihood of an event based on the strength of the signal versus the local context, in particular repeat content and proportion of signal-to-‘context’ matches. 
 
 ### Version
 The software is alpha version. A user-friendly version will be available soon.
