@@ -3,7 +3,7 @@ Detection of novel *Alu* exonization events from RNA-seq data
 
 Described in:
 
-  Florea L, Payer L, Antonescu C, Yang G and Burns K. (2021) Detection of Alu exonization events in human frontal cortex from RNA-seq data, *Submitted*.
+  Florea L, Payer L, Antonescu C, Yang G and Burns K. (2021) Detection of *Alu* exonization events in human frontal cortex from RNA-seq data, *Submitted*.
 
 Supplementary data described in the article can be found [here](http://ccb.jhu.edu/software/Alubaster/data/).
 
