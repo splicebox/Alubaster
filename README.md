@@ -14,8 +14,15 @@ Copyright (C) 2018-2021 and GNU GPL v3.0 by Liliana Florea, Lindsay Payer
 ### Synopsis
 Alubaster identifies candidate gene loci by locating mapped reads (‘anchors’) whose *Alu*-containing mates could not be found in the genome. It then applies two types of filters to select a more accurate subset of loci. The first, a *signal filter*, identifies read evidence for an Alu exonization event, by searching the mate’s sequence against a concatenation of the neighboring exons’ and *Alu* sequences while concomitantly ruling out false positive matches that could have resulted from local or more distant *Alu* elements in the genome. The second, a *context filter*, evaluates the likelihood of an event based on the strength of the signal versus the local context, in particular repeat content and proportion of signal-to-‘context’ matches. 
 
-### Version
-The software is alpha version. A user-friendly version will be available soon.
+### Installation
+Alubaster is written in Perl. To download the source code, clone the current GitHub repository:
+
+```
+git clone https://github.com/splicebox/Alubaster.git
+```
+
+#### Prerequisites
+Required bioinformatics packages: [sim4db](https://sourceforge.net/projects/kmer), [oases](https://github.com/dzerbino/oases) and [kraken](https://github.com/DerrickWood/kraken). A copy of the 'oases' program is included with this software. Follow the instructions for each program to install and compile, then update the paths in the file 'ALUBASTER.config.sh'.
 
 ### Terms of use
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
