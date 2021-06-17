@@ -22,8 +22,21 @@ git clone https://github.com/splicebox/Alubaster.git
 ```
 
 #### Prerequisites
-Required bioinformatics packages: [sim4db](https://sourceforge.net/projects/kmer), [oases](https://github.com/dzerbino/oases) and [kraken](https://github.com/DerrickWood/kraken). A copy of the 'oases' program is included with this software. Follow the instructions for each program to install and compile, then update the paths in the file 'ALUBASTER.config.sh'.
+Required bioinformatics packages: [sim4db](https://sourceforge.net/projects/kmer), [oases](https://github.com/dzerbino/oases), [tophat2](https://github.com/infphilo/tophat) and [kraken](https://github.com/DerrickWood/kraken). A copy of the 'oases' program is included with this software. Follow the instructions for each program to install and compile, then update the paths in the file 'ALUBASTER.config.sh'.
 
+### Usage
+```
+  runAlubaster.pl <SampleName> <TophatDir> <FastqDir> <OutputDir>
+
+  Required parameters:
+  
+  <SampleName>  Sample name as it apears in fastq files (i.e sample name would be ABC if fastq files are ABC_{1,2}.fastq.gz)
+  <TophatDir>   Path to a directory containing tophat output ('accepted_hits.bam' and 'unmapped.bam') for this sample
+  <FastqDir>    Path to fastq files directory
+  <OutputDir>   Path to a directory where the analysis is done.  If it does not exist, it will be created.
+                For each sample, a subdirectory will be created and all the out files for this run will be written there;
+                e.g., for sample ABC the results will be written to <OutputDir>/ABC/
+    
 ### Terms of use
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 
