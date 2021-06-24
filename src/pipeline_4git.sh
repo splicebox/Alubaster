@@ -243,7 +243,7 @@ for i in 21 23 25 27
 do
    ${SCRIPTS}/call_assembly.pl ${SET}.u.asm.all_selection.c0.8.p80.r10.txt \
                     ${SET}.nonconcordant.fa ${SET}.nonconcordant.mates.fa \
-                    -gi $GINDEX -ge $GENDEX -gen $GENOME -p ${SET}.u.asm.k${i} ${i} 2> ${SET}.u.asm.k${i}.log
+                    -gi $TXPT2GENE -ge $GENDEX -gen $GENOME -p ${SET}.u.asm.k${i} ${i} 2> ${SET}.u.asm.k${i}.log
 done
 wait
 echo -e "Done step11 \n"
