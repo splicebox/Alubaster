@@ -25,7 +25,7 @@ git clone https://github.com/splicebox/Alubaster.git
 Required bioinformatics packages: [sim4db](https://sourceforge.net/projects/kmer), [oases](https://github.com/dzerbino/oases), [tophat2](https://github.com/infphilo/tophat) and [kraken](https://github.com/DerrickWood/kraken). A copy of the 'oases' program is included with this software. Follow the instructions for each program to install and compile, then update the paths in the file 'ALUBASTER.config.sh'.
 
 #### Before you start
-Before you start your first Alubaster run, you will need to prepare several reference data files:![image](https://user-images.githubusercontent.com/39348708/123337319-0895da00-d515-11eb-9b44-5a2f6d2904c5.png)
+Before you start your first Alubaster run, you will need to prepare several reference data files:
 
 1. Download the GENCODE gene annotation file (version of your choice) from [gencodegenes.org](http://gencodegenes.org) (GTF file). Save this file in a directory of your choice.
 2. Generate a header file for the genome fasta file, ideally in the same directory as the genome:
