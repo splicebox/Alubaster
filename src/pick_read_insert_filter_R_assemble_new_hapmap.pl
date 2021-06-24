@@ -2,7 +2,7 @@
 use strict;
 
 my $Usage =
-"Usage: $0 [options] overlaps selection SIGNAL REGION UNSPLICED
+"Usage: $0 [options] annotindex overlaps selection SIGNAL REGION UNSPLICED
     [options]
     -enum | -b mins minsn mins2sn mins2sru mins2ru (default: -enum)
                mutually exclusive; list current values (-enum) vs apply filter (-b)
@@ -10,6 +10,7 @@ my $Usage =
                (default: off)\n
     -p prefix  used with -debug; use this as prefix for debug file (default:AA)\n
     [required]
+    annotindex txpt2gene file
     overlaps   overlaps file
     selection  selection file
     SIGNAL     SIGNAL nr file
@@ -17,9 +18,6 @@ my $Usage =
     UNSPLICED  UNSPLICED nr file
 ";
 ($#ARGV>2) or die $Usage;
-
-my $Txpt2GeneFile = "/ccb/salz4-1/florea/repeat/Data/gencode.v22.Txpt2Gene";
-#my $OverlapsFile = "SRR1284895sim/SRR1284895sim.nonconcordant.genes.SORTED.bed";
 
 my $isEnum = 1;
 my $isDebug = 0;
@@ -47,7 +45,8 @@ while ($argtmp=~/^\-/) {
    }
    $argtmp = shift; 
 }
-my $OverlapsFile = $argtmp;
+my $Txpt2GeneFile = $argtmp;
+my $OverlapsFile = shift;
 my $SelectionFile = shift;
 my $SignalFile = shift;
 my $RegionFile = shift;
@@ -126,7 +125,7 @@ close(F);
 my %Txpt2Gene;
 open(F, "<$Txpt2GeneFile") or die "Could not open Txpt2Gene file $Txpt2GeneFile";
 while (<F>) {
-   # ENSG00000000003.13"; "ENST00000373020.7"; "TSPAN6";
+   # ENSG00000000003.13"; "ENST00000373020.7"; "TSPAN6"; chr1 61324347 61330001
    chomp;
    /^\"(\S+)\"; \"(\S+)\"; \"(\S+)\";/ or die "died. $_";
    $Txpt2Gene{$2} = $1;
