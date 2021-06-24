@@ -6,7 +6,7 @@ SDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 . $SDIR/ALUBASTER.config.sh  
 
 #USAGE:
-# pipeline_4git.sh SRR820468 /ccb/salz4-1/cbc_core/Florea_Burns_Jan2020/data/Tophat_cerebellum/ /ccb/salz3/florea/NewJulip/Cerebellum /ccb/salz4-1/cbc_core/Florea_Burns_Jan2020/Test4git/cereb &> test.log
+# pipeline_4git.sh samplename /local/path/to/project/tophat/samplename/ /local/path/to/project/fastq /local/path/to/project/results/ &> test.log
 
 usage() {
   cat <<EOM
@@ -277,7 +277,7 @@ for i in 21 23 25 27
 do
    ${SCRIPTS}/call_assembly.pl ${SET}.u.asm.all_selection.c0.8.p80.r10.txt \
                     ${SET}.nonconcordant.fa ${SET}.nonconcordant.mates.fa \
-                    -gi $GINDEX -ge $GENDEX -gen $GENOME -p ${SET}.u.asm.k${i} ${i} 2> ${SET}.u.asm.k${i}.log
+                    -gi $TXPT2GENE -ge $GENDEX -gen $GENOME -p ${SET}.u.asm.k${i} ${i} 2> ${SET}.u.asm.k${i}.log
 done
 wait
 echo -e "Done step11 \n"
