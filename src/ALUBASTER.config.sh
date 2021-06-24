@@ -1,36 +1,35 @@
-##  Software  
+##  Software
 ##------------
 
-# Alubaster pipeline (this script) location 
-SCRIPTS=/ccb/salz4-1/cbc_core/Florea_Burns_Jan2020/Pipeline4git/software      #/path/to/Alubaster/scripts/directory
-# /scratch/groups/lflorea1/shared/sw/src/sim4db-r2008/Linux-amd64/bin
-SIM4DB=/ccb/salz4-1/cbc_core/scripts/sim4db/sim4db-r2008/Linux-amd64/bin  # /path/to/sim4db/bin/directory
-# /path/to/oases/executable   
-#/scratch/groups/lflorea1/projects/Repeat/Alubaster/software/oases/oases
+# NOTE: oases is included with the distribution
+SCRIPTS=/path/to/Alubaster/
+SIM4DB=/path/to/sim4db/bin/directory
 OASES=${SCRIPTS}/oases/oases
-# /path/to/velveth/executable
 VELVETH=${SCRIPTS}/oases/velvet/tvelveth
-# /path/to/velvetg/executable
 VELVETG=${SCRIPTS}/oases/velvet/velvetg
-#/path/to/tophat/executable
-TOPHAT=tophat2 
+TOPHAT=tophat2
 
-##  Required Reference files directory 
+##  Required reference files directory
 ##-------------------------------------
+REFDIR=$SCRIPTS/reference
 
-GENDIR=/ccb/salz4-1/florea/repeat/Data             #/path/to/required/reference/files/forAlubaster
+# Alu databases and consensus Alu sequences
+ALUDB=$REFDIR/ALUdb.fasta
+ALUFA=$REFDIR/ALU
+KRAKENDB=$REFDIR/krakendb_alu                # if not provided with the software, you can find a link to a copy from the README.md file;
+                                             # then 'gunzip' an d 'tar -xvf' the file
 
-KRAKENDB=$GENDIR/krakendb_alu
-ALUDB=$GENDIR/ALUdb.fasta
-ALUFA=$GENDIR/ALU
+# genes, genomes and indices
+BWT2IDX=/path/to/genome/dir/bowtie2prefix    # e.g., /data/genomes/hg38/hg38
+GENOME=/path/to/genome/genomefasta           # e.g., /data/genome/hg38/hg38.fa
+GENDEX=/path/to/genome/genomefasta.hdrs      # generate this with 'grep "^>" genome.fa > genome.hdrs' ; e.g., /data/genome/hg38/hg38.fa.hdrs
+ANNOT=/path/to/gene/annotation/gencodegtf    # e.g., /data/genome/hg38/annotation/gencode.v22.annotation.gtf
 
-BWT2IDX=/ccb/salz7-data/genomes/hg38/hg38c   #$GENDIR/hg38/hg38c
-GENOME=/ccb/salz7-data/genomes/hg38/hg38c.fa     #GENOME=$GENDIR/hg38/hg38c.fa
-GENDEX="/ccb/salz7-data/genomes/hg38/hg38c.fa.hdrs"                  #$GENDIR/hg38/hg38c.fa.hdrs
-ANNOT=/home/florea/gencode.v22.annotation.gtf      #$GENDIR/gencode.v22.annotation.gtf
-
-TXPT2GENE=$GENDIR/gencode.v22.Txpt2Gene
-EXONS=$GENDIR/gencode.v22.mx.singl_exon.bed
-GINDEX=$GENDIR/gencode.v22.Txpt2Gene2
+# in the reference directory
+TXPT2GENE=$REFDIR/gencode.vXX.Txpt2Gene      # generate this with 'perl ./get_annot_index.pl < gencode.v36.annotation.gtf > gencode.v36.Txpt2Gene'
+EXONS=$REFDIR/gencode.vXX.mx.singl_exon.bed  # this file contains the exons in multi-exon transcripts, one per line; generate this with
+                                             # 'gtf2bed gencode.vXX.annotation.gtf  |  awk '{ if ($10!=1) print $_; }' | bedtools bed12tobed6 > gencode.vXX.mx.singl_exon.bed'
+                                             # or using your own scripts. Expected format:
+                                             # chr1    11868   12227   ENST00000456328.2       0       +
 
 
