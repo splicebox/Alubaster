@@ -7,8 +7,8 @@ my $txpt2geneFile = shift;
 my %geneId2geneName;
 open(F, "<$txpt2geneFile") or die "could not open $txpt2geneFile";  #gencode.v22.Txpt2Gene
 while (<F>) {
-  # "ENSG00000000003.13"; "ENST00000373020.7"; "TSPAN6";
-  /^\"(\S+)\"; \S+ \"(\S+)\";$/ or die "died (1) add_gene_name at $_";
+  # "ENSG00000000003.13"; "ENST00000373020.7"; "TSPAN6"; chr1 61324347 61330001
+  /^\"(\S+)\"; \S+ \"(\S+)\";/ or die "died (1) add_gene_name at $_";
   $geneId2geneName{$1} = $2; 
 }
 close(F);
