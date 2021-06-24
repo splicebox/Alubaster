@@ -24,6 +24,34 @@ git clone https://github.com/splicebox/Alubaster.git
 #### Prerequisites
 Required bioinformatics packages: [sim4db](https://sourceforge.net/projects/kmer), [oases](https://github.com/dzerbino/oases), [tophat2](https://github.com/infphilo/tophat) and [kraken](https://github.com/DerrickWood/kraken). A copy of the 'oases' program is included with this software. Follow the instructions for each program to install and compile, then update the paths in the file 'ALUBASTER.config.sh'.
 
+#### Before you start
+Before you start your first Alubaster run, you will need to prepare several reference data files:![image](https://user-images.githubusercontent.com/39348708/123337319-0895da00-d515-11eb-9b44-5a2f6d2904c5.png)
+
+1. Download the GENCODE gene annotation file (version of your choice) from [gencodegenes.org](http://gencodegenes.org) (GTF file). Save this file in a directory of your choice.
+2. Generate a header file for the genome fasta file, ideally in the same directory as the genome:
+```
+grep "^>" genome.fa > genome.fa.hdrs
+```
+
+Next, perform the following steps in the reference directory:
+
+3. Generate the annotation index:
+```
+ perl make_annot_index.pl  < gencode.vXX.annotation.gtf > gencode.vXX.annotation.Txpt2Gene
+```
+4. Generate the exons file, for instance by converting the GTF annotation file to multi-block BED, filtering out single exon transcripts, and then extracting the individual exons in a BED file:
+```
+gtf2bed gencode.vXX.annotation.gtf  |  awk '{ if ($10!=1) print $_; }' | bedtools bed12tobed6 > gencode.vXX.mx.singl_exon.bed
+```
+or you can use your own scripts. The format for the output file is:
+```
+# chrom    from    to   enstranscriptID     0      strand
+chr1    11868   12227   ENST00000456328.2       0       +
+```
+5. You should find a copy of the kraken Alu sequence database in the ‘reference’ directory. If not already there, for instance because of file size restrictions, you can download a copy [here](https://ccb.jhu.edu/software/Alubaster/data/). Copy this in the 'reference' directory, or elsewhere, and extract the files, for instance with 'gunzip' and 'tar -xvf'.
+6. Update the paths in the 'ALUBASTER.config.sh' file to point to your local files and software.
+
+
 ### Usage
 ```
   runAlubaster.sh <SampleName> <TophatDir> <FastqDir> <OutputDir>
