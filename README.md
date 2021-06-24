@@ -1,5 +1,5 @@
 ## Alubaster
-Detection of novel *Alu* exonization events from RNA-seq data
+Detection of novel *Alu* exonization events from RNA-seq data.
 
 Described in:
 
