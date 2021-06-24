@@ -2,7 +2,7 @@
 use strict;
 
 my $Usage =
-"Usage: $0 [options] annotindex overlaps selection SIGNAL REGION UNSPLICED
+"Usage: $0 [options] overlaps selection SIGNAL REGION UNSPLICED
     [options]
     -enum | -b mins minsn mins2sn mins2sru mins2ru (default: -enum)
                mutually exclusive; list current values (-enum) vs apply filter (-b)
@@ -10,7 +10,6 @@ my $Usage =
                (default: off)\n
     -p prefix  used with -debug; use this as prefix for debug file (default:AA)\n
     [required]
-    annotindex txpt2gene file
     overlaps   overlaps file
     selection  selection file
     SIGNAL     SIGNAL nr file
@@ -45,13 +44,14 @@ while ($argtmp=~/^\-/) {
    }
    $argtmp = shift; 
 }
-my $Txpt2GeneFile = $argtmp;
-my $OverlapsFile = shift;
+
+my $OverlapsFile = $argtmp;
 my $SelectionFile = shift;
 my $SignalFile = shift;
 my $RegionFile = shift;
 my $UnsplicedFile = shift;
 
+my $Txpt2GeneFile = $ENV{TXPT2GENE};
 
 # sort by chrom,genename: groups, bed, Selection, SIGNAL.nr, UNSPLICED.nr, REGION.nr
 
