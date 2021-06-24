@@ -4,7 +4,7 @@
 # NOTE: oases is included with the distribution
 SCRIPTS=/path/to/Alubaster/
 SIM4DB=/path/to/sim4db/bin/directory
-OASES=${SCRIPTS}/oases/oases
+OASES=${SCRIPTS}/oases/oases                 # copy your oases software here
 VELVETH=${SCRIPTS}/oases/velvet/tvelveth
 VELVETG=${SCRIPTS}/oases/velvet/velvetg
 TOPHAT=tophat2
