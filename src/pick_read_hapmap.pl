@@ -14,8 +14,8 @@ my %isUNSPLICED;
 my %Txpt2Gene;
 open(T, "<$ANNOT") or die "txpt2gene.\n";
 while (<T>) {
-  # "ENSG00000000003.13"; "ENST00000373020.7"; "TSPAN6";
-  /^\"(\S+)\"; \"(\S+)\"; \"(\S+)\";$/ or die "died. $_";
+  # "ENSG00000000003.13"; "ENST00000373020.7"; "TSPAN6"; chr1  1623413265 1623416666
+  /^\"(\S+)\"; \"(\S+)\"; \"(\S+)\";/ or die "died. $_";
   $Txpt2Gene{"$1:$2"} = $3;
 }
 close(T);
